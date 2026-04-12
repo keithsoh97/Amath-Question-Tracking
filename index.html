@@ -163,11 +163,9 @@ const SHEET_TAB = 'ALL';
 const DIFF_LABEL = { 'Normal': 'Normal', 'Challenging': 'Challenging', 'Very Challenging': 'Very Challenging' };
 const DIFF_CLASS = { 'Normal': 'n1', 'Challenging': 'n2', 'Very Challenging': 'n3' };
 
- function makePdfLink(driveUrl, page, label) {
-  const m = driveUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (!m) return driveUrl;
+ function makePdfLink(pdfUrl, page, label) {
   const base = window.location.origin + window.location.pathname.replace('index.html','');
-  return `${base}viewer.html?id=${m[1]}&page=${page}&label=${encodeURIComponent(label||'')}`;
+  return `${base}viewer.html?id=${encodeURIComponent(pdfUrl)}&page=${page}&label=${encodeURIComponent(label||'')}`;
 }
 
 let allQuestions = [];
