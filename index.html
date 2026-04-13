@@ -15,21 +15,15 @@
     --text: #1C1A17;
     --text2: #6B6560;
     --text3: #A09990;
-
-    /* AMath — green */
     --amath-accent: #2D6A4F;
     --amath-light: #D8EDDF;
     --amath-text: #1B4332;
-
-    /* EMath — blue */
     --emath-accent: #1D4ED8;
     --emath-light: #DBEAFE;
     --emath-text: #1E3A8A;
-
     --accent: #2D6A4F;
     --accent-light: #D8EDDF;
     --accent-text: #1B4332;
-
     --amber: #B45309;
     --amber-light: #FEF3C7;
     --red: #991B1B;
@@ -47,14 +41,9 @@
   .sidebar-header h1 { font-family: var(--font-display); font-size: 20px; font-weight: 400; line-height: 1.2; }
   .sidebar-header p { font-size: 12px; color: var(--text3); margin-top: 4px; }
 
-  /* Subject switcher */
   .subject-switcher { padding: 12px 16px; border-bottom: 1px solid var(--border); }
   .switcher-inner { display: flex; background: var(--bg); border-radius: var(--radius); padding: 3px; gap: 3px; }
-  .switcher-btn {
-    flex: 1; padding: 7px 10px; border: none; border-radius: 6px;
-    font-size: 13px; font-weight: 500; font-family: var(--font-body);
-    cursor: pointer; transition: all 0.15s; color: var(--text2); background: none;
-  }
+  .switcher-btn { flex: 1; padding: 7px 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; font-family: var(--font-body); cursor: pointer; transition: all 0.15s; color: var(--text2); background: none; }
   .switcher-btn.active-amath { background: var(--surface); color: var(--amath-accent); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
   .switcher-btn.active-emath { background: var(--surface); color: var(--emath-accent); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
 
@@ -75,13 +64,7 @@
   h2 { font-family: var(--font-display); font-size: 28px; font-weight: 400; margin-bottom: 6px; }
   .page-desc { font-size: 14px; color: var(--text2); margin-bottom: 32px; }
 
-  /* Subject badge in heading */
-  .subject-badge {
-    display: inline-block; font-size: 11px; font-weight: 500;
-    padding: 2px 10px; border-radius: 100px; margin-left: 10px;
-    vertical-align: middle; position: relative; top: -3px;
-    font-family: var(--font-body);
-  }
+  .subject-badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 10px; border-radius: 100px; margin-left: 10px; vertical-align: middle; position: relative; top: -3px; font-family: var(--font-body); }
   .subject-badge.amath { background: var(--amath-light); color: var(--amath-text); }
   .subject-badge.emath { background: var(--emath-light); color: var(--emath-text); }
 
@@ -94,6 +77,7 @@
   .chip.diff-normal.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .chip.diff-challenging.on { background: var(--amber); border-color: var(--amber); color: #fff; }
   .chip.diff-very.on { background: var(--red); border-color: var(--red); color: #fff; }
+  .chip.all-chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 
   .subtopic-wrap { margin-top: 10px; padding: 14px 16px; background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border); display: none; }
   .subtopic-wrap.visible { display: block; }
@@ -162,7 +146,7 @@
     </div>
 
     <nav class="nav">
-      <button class="nav-item active" onclick="showPage('filter')">Filter by Topic and Difficulty</button>
+      <button class="nav-item active" onclick="showPage('filter')">Filter by Topic</button>
       <button class="nav-item" onclick="showPage('browse')">Browse Paper</button>
     </nav>
     <div class="sidebar-stats">
@@ -180,7 +164,7 @@
 
     <div class="page active" id="page-filter">
       <h2>Filter <span class="subject-badge amath" id="filter-badge">A-Math</span></h2>
-      <p class="page-desc">Select a topic and difficulty to find matching questions from past papers.</p>
+      <p class="page-desc" id="filter-desc">Select a topic and difficulty to find matching questions from past papers.</p>
       <div id="filter-area">
         <div class="loading"><div class="spinner"></div>Loading questions...</div>
       </div>
@@ -198,18 +182,16 @@
 
 <script>
 // ============================================================
-// CONFIGURE THESE VALUES
-// ============================================================
-const SHEET_ID   = '1_ZWfd-DKyHf1YPhe7vTLRsGc5-GthYAfzZ3hE-D3EWU';
-const API_KEY    = 'AIzaSyCB6O5EIdEl4JCHkCcilrrufOHqR12LxmE';
+const SHEET_ID = '1_ZWfd-DKyHf1YPhe7vTLRsGc5-GthYAfzZ3hE-D3EWU';
+const API_KEY  = 'AIzaSyCB6O5EIdEl4JCHkCcilrrufOHqR12LxmE';
 const TABS = { amath: 'ALL', emath: 'EMATH' };
 // ============================================================
 
 const DIFF_LABEL = { 'Normal': 'Normal', 'Challenging': 'Challenging', 'Very Challenging': 'Very Challenging' };
 const DIFF_CLASS = { 'Normal': 'n1', 'Challenging': 'n2', 'Very Challenging': 'n3' };
+const DIFF_ORDER = { 'Very Challenging': 0, 'Challenging': 1, 'Normal': 2 };
 
 const cache = { amath: null, emath: null };
-
 let currentSubject = 'amath';
 let allQuestions = [];
 let selectedTopic = null;
@@ -217,14 +199,15 @@ let selectedSubtopic = null;
 let selectedDiff = null;
 
 function makePdfLink(pdfUrl, page, label) {
-  const base = window.location.origin + window.location.pathname.replace('index.html','');
-  return `${base}viewer.html?id=${encodeURIComponent(pdfUrl)}&page=${page}&label=${encodeURIComponent(label||'')}`;
+  const base = window.location.origin + window.location.pathname.replace('index.html', '');
+  return `${base}viewer.html?id=${encodeURIComponent(pdfUrl)}&page=${page}&label=${encodeURIComponent(label || '')}`;
 }
+
+function isEmath() { return currentSubject === 'emath'; }
 
 async function loadSheet(subject) {
   if (cache[subject]) return cache[subject];
-  const tab = TABS[subject];
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${tab}?key=${API_KEY}`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${TABS[subject]}?key=${API_KEY}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error();
   const data = await res.json();
@@ -251,32 +234,29 @@ async function switchSubject(subject) {
   if (subject === currentSubject) return;
   currentSubject = subject;
 
-  // Update switcher buttons
   document.getElementById('btn-amath').className = 'switcher-btn' + (subject === 'amath' ? ' active-amath' : '');
   document.getElementById('btn-emath').className = 'switcher-btn' + (subject === 'emath' ? ' active-emath' : '');
 
-  // Update accent colour
-  const accent = subject === 'amath' ? '#2D6A4F' : '#1D4ED8';
+  const accent      = subject === 'amath' ? '#2D6A4F' : '#1D4ED8';
   const accentLight = subject === 'amath' ? '#D8EDDF' : '#DBEAFE';
-  const accentText = subject === 'amath' ? '#1B4332' : '#1E3A8A';
+  const accentText  = subject === 'amath' ? '#1B4332' : '#1E3A8A';
   document.documentElement.style.setProperty('--accent', accent);
   document.documentElement.style.setProperty('--accent-light', accentLight);
   document.documentElement.style.setProperty('--accent-text', accentText);
 
-  // Update badges
   const badgeClass = subject === 'amath' ? 'amath' : 'emath';
   const badgeLabel = subject === 'amath' ? 'A-Math' : 'E-Math';
-  ['filter-badge','browse-badge'].forEach(id => {
+  ['filter-badge', 'browse-badge'].forEach(id => {
     const el = document.getElementById(id);
     el.className = `subject-badge ${badgeClass}`;
     el.textContent = badgeLabel;
   });
   document.getElementById('stats-label').textContent = badgeLabel;
+  document.getElementById('filter-desc').textContent = isEmath()
+    ? 'Select a topic to instantly find matching questions. Rated questions appear first.'
+    : 'Select a topic and difficulty to find matching questions from past papers.';
 
-  // Reset filters
   selectedTopic = null; selectedSubtopic = null; selectedDiff = null;
-
-  // Show loading
   document.getElementById('filter-area').innerHTML = '<div class="loading"><div class="spinner"></div>Loading questions...</div>';
   document.getElementById('browse-area').innerHTML = '<div class="loading"><div class="spinner"></div>Loading questions...</div>';
 
@@ -286,7 +266,7 @@ async function switchSubject(subject) {
     buildFilterUI();
     buildBrowseUI();
   } catch(e) {
-    showError(`Could not load ${badgeLabel} questions. Check your sheet tab name and sharing settings.`);
+    showError(`Could not load ${badgeLabel} questions. Check the sheet tab is named "${TABS[subject]}" and is publicly shared.`);
   }
 }
 
@@ -332,6 +312,26 @@ function getTopicMap() {
 function buildFilterUI() {
   const map = getTopicMap();
   const topics = Object.keys(map).sort();
+
+  const diffSection = isEmath() ? '' : `
+    <div class="filter-section">
+      <div class="filter-label">Difficulty</div>
+      <div class="chip-wrap">
+        <button class="chip diff-normal" data-diff="Normal" onclick="toggleDiff(this)">Normal</button>
+        <button class="chip diff-challenging" data-diff="Challenging" onclick="toggleDiff(this)">Challenging</button>
+        <button class="chip diff-very" data-diff="Very Challenging" onclick="toggleDiff(this)">Very challenging</button>
+      </div>
+    </div>`;
+
+  const actionRow = isEmath() ? `
+    <div class="action-row" id="clear-row" style="display:none;">
+      <button class="btn-ghost" onclick="clearFilters()">Clear filters</button>
+    </div>` : `
+    <div class="action-row">
+      <button class="btn-primary" onclick="findQuestions()">Show questions</button>
+      <button class="btn-ghost" onclick="clearFilters()">Clear filters</button>
+    </div>`;
+
   document.getElementById('filter-area').innerHTML = `
     <div class="filter-section">
       <div class="filter-label">Topic</div>
@@ -343,18 +343,8 @@ function buildFilterUI() {
         <div class="chip-wrap" id="subtopic-chips"></div>
       </div>
     </div>
-    <div class="filter-section">
-      <div class="filter-label">Difficulty</div>
-      <div class="chip-wrap">
-        <button class="chip diff-normal" data-diff="Normal" onclick="toggleDiff(this)">Normal</button>
-        <button class="chip diff-challenging" data-diff="Challenging" onclick="toggleDiff(this)">Challenging</button>
-        <button class="chip diff-very" data-diff="Very Challenging" onclick="toggleDiff(this)">Very challenging</button>
-      </div>
-    </div>
-    <div class="action-row">
-      <button class="btn-primary" onclick="findQuestions()">Show questions</button>
-      <button class="btn-ghost" onclick="clearFilters()">Clear filters</button>
-    </div>
+    ${diffSection}
+    ${actionRow}
     <div id="results"></div>
   `;
 }
@@ -362,13 +352,20 @@ function buildFilterUI() {
 function toggleTopic(el, topic) {
   topic = el.dataset.topic;
   document.querySelectorAll('#topic-chips .chip').forEach(c => c.classList.remove('on'));
+
   if (selectedTopic === topic) {
     selectedTopic = null; selectedSubtopic = null;
     document.getElementById('subtopic-wrap').classList.remove('visible');
+    document.getElementById('results').innerHTML = '';
+    if (isEmath()) document.getElementById('clear-row').style.display = 'none';
   } else {
     selectedTopic = topic; selectedSubtopic = null;
     el.classList.add('on');
     refreshSubtopics();
+    if (isEmath()) {
+      document.getElementById('clear-row').style.display = 'flex';
+      findQuestions();
+    }
   }
 }
 
@@ -378,18 +375,22 @@ function refreshSubtopics() {
   const subs = map[selectedTopic] ? Array.from(map[selectedTopic]).sort() : [];
   const wrap = document.getElementById('subtopic-wrap');
   if (subs.length === 0) { wrap.classList.remove('visible'); return; }
+
   document.getElementById('subtopic-label').textContent = `Subtopic — ${selectedTopic}`;
-  document.getElementById('subtopic-chips').innerHTML = subs.map(s =>
+  const allChip = `<button class="chip all-chip on" data-sub="" onclick="toggleSub(this,this.dataset.sub)">All</button>`;
+  const subChips = subs.map(s =>
     `<button class="chip" data-sub="${s}" onclick="toggleSub(this,this.dataset.sub)">${s}</button>`
   ).join('');
+  document.getElementById('subtopic-chips').innerHTML = allChip + subChips;
   wrap.classList.add('visible');
 }
 
 function toggleSub(el, sub) {
   sub = el.dataset.sub;
   document.querySelectorAll('#subtopic-chips .chip').forEach(c => c.classList.remove('on'));
-  if (selectedSubtopic === sub) { selectedSubtopic = null; }
-  else { selectedSubtopic = sub; el.classList.add('on'); }
+  el.classList.add('on');
+  selectedSubtopic = sub === '' ? null : sub;
+  if (isEmath()) findQuestions();
 }
 
 function toggleDiff(el) {
@@ -405,6 +406,15 @@ function clearFilters() {
   const sw = document.getElementById('subtopic-wrap');
   if (sw) sw.classList.remove('visible');
   document.getElementById('results').innerHTML = '';
+  if (isEmath()) document.getElementById('clear-row').style.display = 'none';
+}
+
+function sortByDifficulty(questions) {
+  return [...questions].sort((a, b) => {
+    const da = DIFF_ORDER[a.difficulty] !== undefined ? DIFF_ORDER[a.difficulty] : 3;
+    const db = DIFF_ORDER[b.difficulty] !== undefined ? DIFF_ORDER[b.difficulty] : 3;
+    return da - db;
+  });
 }
 
 function findQuestions() {
@@ -412,22 +422,34 @@ function findQuestions() {
   if (selectedTopic) res = res.filter(q => q.topic === selectedTopic);
   if (selectedSubtopic) res = res.filter(q => q.subtopic === selectedSubtopic);
   if (selectedDiff) res = res.filter(q => String(q.difficulty).trim() === String(selectedDiff).trim());
+  if (isEmath()) res = sortByDifficulty(res);
+
   const el = document.getElementById('results');
   if (res.length === 0) {
-    el.innerHTML = `<div class="empty-state"><p>No questions match your filters.<br>Try a different topic or difficulty level.</p></div>`;
+    el.innerHTML = `<div class="empty-state"><p>No questions match your filters.<br>Try a different topic or subtopic.</p></div>`;
     return;
   }
+
   el.innerHTML = `<div class="table-wrap">
-    <div class="table-meta">${res.length} question${res.length!==1?'s':''} found</div>
+    <div class="table-meta">${res.length} question${res.length !== 1 ? 's' : ''} found</div>
     <table>
-      <thead><tr><th>School</th><th>Year</th><th>Paper</th><th>Question</th><th>Topic</th><th>Subtopic</th><th>Difficulty</th><th></th></tr></thead>
+      <thead><tr>
+        <th>School</th><th>Year</th><th>Paper</th><th>Question</th>
+        <th>Topic</th><th>Subtopic</th><th>Difficulty</th><th></th>
+      </tr></thead>
       <tbody>${res.map(q => `<tr>
-        <td>${q.school||'—'}</td><td>${q.year||'—'}</td><td>${q.paper||'—'}</td>
+        <td>${q.school||'—'}</td>
+        <td>${q.year||'—'}</td>
+        <td>${q.paper||'—'}</td>
         <td style="font-weight:500">${q.question||'—'}</td>
         <td>${q.topic||'—'}</td>
         <td style="color:var(--text2)">${q.subtopic||'—'}</td>
-        <td><span class="badge ${DIFF_CLASS[q.difficulty]||'n1'}">${DIFF_LABEL[q.difficulty]||q.difficulty}</span></td>
-        <td>${q.pdf_link && q.page ? `<a href="${makePdfLink(q.pdf_link, q.page, q.question)}" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:500;white-space:nowrap;">View ↗</a>` : '—'}</td>
+        <td>${q.difficulty
+          ? `<span class="badge ${DIFF_CLASS[q.difficulty]||'n1'}">${DIFF_LABEL[q.difficulty]||q.difficulty}</span>`
+          : '<span style="color:var(--text3);font-size:12px;">—</span>'}</td>
+        <td>${q.pdf_link && q.page
+          ? `<a href="${makePdfLink(q.pdf_link, q.page, q.question)}" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:500;white-space:nowrap;">View ↗</a>`
+          : '—'}</td>
       </tr>`).join('')}</tbody>
     </table>
   </div>`;
@@ -435,7 +457,7 @@ function findQuestions() {
 
 function buildBrowseUI() {
   const schools = [...new Set(allQuestions.map(q => q.school))].filter(Boolean).sort();
-  const years   = [...new Set(allQuestions.map(q => q.year))].filter(Boolean).sort((a,b) => b-a);
+  const years   = [...new Set(allQuestions.map(q => q.year))].filter(Boolean).sort((a, b) => b - a);
   document.getElementById('browse-area').innerHTML = `
     <div class="paper-filters">
       <select id="filter-school" onchange="renderPapers()">
@@ -466,7 +488,7 @@ function renderPapers() {
     paperMap[key].questions.push(q);
   });
 
-  const papers = Object.values(paperMap).sort((a,b) => {
+  const papers = Object.values(paperMap).sort((a, b) => {
     if (a.school !== b.school) return a.school.localeCompare(b.school);
     return b.year - a.year;
   });
@@ -482,14 +504,14 @@ function renderPapers() {
       <div class="paper-card-header" onclick="togglePaper('paper-${i}')">
         <div>
           <div class="paper-card-title">${p.school} — ${p.year} Paper ${p.paper}</div>
-          <div class="paper-card-meta">${p.questions.length} question${p.questions.length!==1?'s':''}</div>
+          <div class="paper-card-meta">${p.questions.length} question${p.questions.length !== 1 ? 's' : ''}</div>
         </div>
         <span class="paper-card-toggle" id="toggle-paper-${i}">Show ▾</span>
       </div>
       <div class="paper-card-body" id="paper-${i}">
         <table>
           <thead><tr><th>Question</th><th>Topic</th><th>Subtopic</th><th>Difficulty</th><th></th></tr></thead>
-          <tbody>${p.questions.sort((a,b) => {
+          <tbody>${p.questions.sort((a, b) => {
             const n1 = parseFloat(a.question) || 0;
             const n2 = parseFloat(b.question) || 0;
             return n1 !== n2 ? n1 - n2 : a.question.localeCompare(b.question);
@@ -497,8 +519,12 @@ function renderPapers() {
             <td style="font-weight:500">${q.question||'—'}</td>
             <td>${q.topic||'—'}</td>
             <td style="color:var(--text2)">${q.subtopic||'—'}</td>
-            <td><span class="badge ${DIFF_CLASS[q.difficulty]||'n1'}">${DIFF_LABEL[q.difficulty]||q.difficulty}</span></td>
-            <td>${q.pdf_link && q.page ? `<a href="${makePdfLink(q.pdf_link, q.page, q.question)}" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:500;white-space:nowrap;">View ↗</a>` : '—'}</td>
+            <td>${q.difficulty
+              ? `<span class="badge ${DIFF_CLASS[q.difficulty]||'n1'}">${DIFF_LABEL[q.difficulty]||q.difficulty}</span>`
+              : '<span style="color:var(--text3);font-size:12px;">—</span>'}</td>
+            <td>${q.pdf_link && q.page
+              ? `<a href="${makePdfLink(q.pdf_link, q.page, q.question)}" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:500;white-space:nowrap;">View ↗</a>`
+              : '—'}</td>
           </tr>`).join('')}</tbody>
         </table>
       </div>
