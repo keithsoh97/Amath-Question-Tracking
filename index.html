@@ -3,35 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Maths Question Bank</title>
+<title>E&A Maths Question Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #F7F6F2;
-    --surface: #FFFFFF;
-    --border: #E2DDD5;
-    --border2: #CBC5BB;
-    --text: #1C1A17;
-    --text2: #6B6560;
-    --text3: #A09990;
-    --amath-accent: #2D6A4F;
-    --amath-light: #D8EDDF;
-    --amath-text: #1B4332;
-    --emath-accent: #1D4ED8;
-    --emath-light: #DBEAFE;
-    --emath-text: #1E3A8A;
-    --accent: #2D6A4F;
-    --accent-light: #D8EDDF;
-    --accent-text: #1B4332;
-    --amber: #B45309;
-    --amber-light: #FEF3C7;
-    --red: #991B1B;
-    --red-light: #FEE2E2;
+    --bg: #F7F6F2; --surface: #FFFFFF; --border: #E2DDD5; --border2: #CBC5BB;
+    --text: #1C1A17; --text2: #6B6560; --text3: #A09990;
+    --amath-accent: #2D6A4F; --amath-light: #D8EDDF; --amath-text: #1B4332;
+    --emath-accent: #1D4ED8; --emath-light: #DBEAFE; --emath-text: #1E3A8A;
+    --accent: #2D6A4F; --accent-light: #D8EDDF; --accent-text: #1B4332;
+    --amber: #B45309; --amber-light: #FEF3C7;
+    --red: #991B1B; --red-light: #FEE2E2;
     --font-display: 'DM Serif Display', Georgia, serif;
     --font-body: 'DM Sans', system-ui, sans-serif;
-    --radius: 8px;
-    --radius-lg: 14px;
+    --radius: 8px; --radius-lg: 14px;
   }
   body { background: var(--bg); font-family: var(--font-body); color: var(--text); font-size: 15px; min-height: 100vh; }
 
@@ -73,19 +59,14 @@
   .chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip { padding: 6px 14px; border-radius: 100px; border: 1px solid var(--border); font-size: 13px; color: var(--text2); cursor: pointer; background: var(--surface); transition: all 0.12s; font-family: var(--font-body); }
   .chip:hover { border-color: var(--border2); color: var(--text); }
-  .chip.on { background: var(--text); border-color: var(--text); color: #fff; }
-  .chip.diff-normal.on { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .chip.diff-challenging.on { background: var(--amber); border-color: var(--amber); color: #fff; }
-  .chip.diff-very.on { background: var(--red); border-color: var(--red); color: #fff; }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .chip.all-chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 
   .subtopic-wrap { margin-top: 10px; padding: 14px 16px; background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border); display: none; }
   .subtopic-wrap.visible { display: block; }
 
-  .action-row { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; }
-  .btn-primary { padding: 10px 24px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer; font-family: var(--font-body); transition: opacity 0.12s; }
-  .btn-primary:hover { opacity: 0.85; }
-  .btn-ghost { padding: 10px 16px; background: none; color: var(--text2); border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; cursor: pointer; font-family: var(--font-body); transition: all 0.12s; }
+  .action-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .btn-ghost { padding: 8px 16px; background: none; color: var(--text2); border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; cursor: pointer; font-family: var(--font-body); transition: all 0.12s; }
   .btn-ghost:hover { border-color: var(--border2); color: var(--text); }
 
   .table-wrap { border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; background: var(--surface); }
@@ -134,17 +115,15 @@
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <h1>Maths<br>Question Bank</h1>
+      <h1>E&A Maths<br>Question Tracker</h1>
       <p>Singapore Secondary Mathematics</p>
     </div>
-
     <div class="subject-switcher">
       <div class="switcher-inner">
         <button class="switcher-btn active-amath" id="btn-amath" onclick="switchSubject('amath')">A-Math</button>
         <button class="switcher-btn" id="btn-emath" onclick="switchSubject('emath')">E-Math</button>
       </div>
     </div>
-
     <nav class="nav">
       <button class="nav-item active" onclick="showPage('filter')">Filter by Topic</button>
       <button class="nav-item" onclick="showPage('browse')">Browse Paper</button>
@@ -161,15 +140,13 @@
     <div class="config-banner" id="config-banner">
       ⚠ Google Sheet not connected yet. Set your SHEET_ID and API_KEY in the script.
     </div>
-
     <div class="page active" id="page-filter">
       <h2>Filter <span class="subject-badge amath" id="filter-badge">A-Math</span></h2>
-      <p class="page-desc" id="filter-desc">Select a topic and difficulty to find matching questions from past papers.</p>
+      <p class="page-desc">Select a topic to instantly find matching questions, sorted by difficulty.</p>
       <div id="filter-area">
         <div class="loading"><div class="spinner"></div>Loading questions...</div>
       </div>
     </div>
-
     <div class="page" id="page-browse">
       <h2>Browse Paper <span class="subject-badge amath" id="browse-badge">A-Math</span></h2>
       <p class="page-desc">View all questions in a specific past year paper.</p>
@@ -193,17 +170,14 @@ const DIFF_ORDER = { 'Very Challenging': 0, 'Challenging': 1, 'Normal': 2 };
 
 const cache = { amath: null, emath: null };
 let currentSubject = 'amath';
-let allQuestions = [];
-let selectedTopic = null;
+let allQuestions   = [];
+let selectedTopic    = null;
 let selectedSubtopic = null;
-let selectedDiff = null;
 
 function makePdfLink(pdfUrl, page, label) {
   const base = window.location.origin + window.location.pathname.replace('index.html', '');
   return `${base}viewer.html?id=${encodeURIComponent(pdfUrl)}&page=${page}&label=${encodeURIComponent(label || '')}`;
 }
-
-function isEmath() { return currentSubject === 'emath'; }
 
 async function loadSheet(subject) {
   if (cache[subject]) return cache[subject];
@@ -252,13 +226,10 @@ async function switchSubject(subject) {
     el.textContent = badgeLabel;
   });
   document.getElementById('stats-label').textContent = badgeLabel;
-  document.getElementById('filter-desc').textContent = isEmath()
-    ? 'Select a topic to instantly find matching questions. Rated questions appear first.'
-    : 'Select a topic and difficulty to find matching questions from past papers.';
 
-  selectedTopic = null; selectedSubtopic = null; selectedDiff = null;
+  selectedTopic = null; selectedSubtopic = null;
   document.getElementById('filter-area').innerHTML = '<div class="loading"><div class="spinner"></div>Loading questions...</div>';
-  document.getElementById('browse-area').innerHTML = '<div class="loading"><div class="spinner"></div>Loading questions...</div>';
+  document.getElementById('browse-area').innerHTML  = '<div class="loading"><div class="spinner"></div>Loading questions...</div>';
 
   try {
     allQuestions = await loadSheet(subject);
@@ -288,9 +259,9 @@ async function init() {
 }
 
 function updateStats() {
-  document.getElementById('s-total').textContent = allQuestions.length;
-  document.getElementById('s-topics').textContent = new Set(allQuestions.map(q => q.topic)).size;
-  document.getElementById('s-papers').textContent = new Set(allQuestions.map(q => `${q.school}_${q.year}_${q.paper}`).filter(x => x !== '__')).size;
+  document.getElementById('s-total').textContent   = allQuestions.length;
+  document.getElementById('s-topics').textContent  = new Set(allQuestions.map(q => q.topic)).size;
+  document.getElementById('s-papers').textContent  = new Set(allQuestions.map(q => `${q.school}_${q.year}_${q.paper}`).filter(x => x !== '__')).size;
 }
 
 function showPage(id) {
@@ -310,28 +281,8 @@ function getTopicMap() {
 }
 
 function buildFilterUI() {
-  const map = getTopicMap();
+  const map    = getTopicMap();
   const topics = Object.keys(map).sort();
-
-  const diffSection = isEmath() ? '' : `
-    <div class="filter-section">
-      <div class="filter-label">Difficulty</div>
-      <div class="chip-wrap">
-        <button class="chip diff-normal" data-diff="Normal" onclick="toggleDiff(this)">Normal</button>
-        <button class="chip diff-challenging" data-diff="Challenging" onclick="toggleDiff(this)">Challenging</button>
-        <button class="chip diff-very" data-diff="Very Challenging" onclick="toggleDiff(this)">Very challenging</button>
-      </div>
-    </div>`;
-
-  const actionRow = isEmath() ? `
-    <div class="action-row" id="clear-row" style="display:none;">
-      <button class="btn-ghost" onclick="clearFilters()">Clear filters</button>
-    </div>` : `
-    <div class="action-row">
-      <button class="btn-primary" onclick="findQuestions()">Show questions</button>
-      <button class="btn-ghost" onclick="clearFilters()">Clear filters</button>
-    </div>`;
-
   document.getElementById('filter-area').innerHTML = `
     <div class="filter-section">
       <div class="filter-label">Topic</div>
@@ -343,8 +294,9 @@ function buildFilterUI() {
         <div class="chip-wrap" id="subtopic-chips"></div>
       </div>
     </div>
-    ${diffSection}
-    ${actionRow}
+    <div class="action-row" id="clear-row" style="display:none;">
+      <button class="btn-ghost" onclick="clearFilters()">Clear filters</button>
+    </div>
     <div id="results"></div>
   `;
 }
@@ -352,35 +304,29 @@ function buildFilterUI() {
 function toggleTopic(el, topic) {
   topic = el.dataset.topic;
   document.querySelectorAll('#topic-chips .chip').forEach(c => c.classList.remove('on'));
-
   if (selectedTopic === topic) {
     selectedTopic = null; selectedSubtopic = null;
     document.getElementById('subtopic-wrap').classList.remove('visible');
     document.getElementById('results').innerHTML = '';
-    if (isEmath()) document.getElementById('clear-row').style.display = 'none';
+    document.getElementById('clear-row').style.display = 'none';
   } else {
     selectedTopic = topic; selectedSubtopic = null;
     el.classList.add('on');
     refreshSubtopics();
-    if (isEmath()) {
-      document.getElementById('clear-row').style.display = 'flex';
-      findQuestions();
-    }
+    document.getElementById('clear-row').style.display = 'flex';
+    findQuestions();
   }
 }
 
 function refreshSubtopics() {
   if (!selectedTopic) return;
-  const map = getTopicMap();
+  const map  = getTopicMap();
   const subs = map[selectedTopic] ? Array.from(map[selectedTopic]).sort() : [];
   const wrap = document.getElementById('subtopic-wrap');
   if (subs.length === 0) { wrap.classList.remove('visible'); return; }
-
   document.getElementById('subtopic-label').textContent = `Subtopic — ${selectedTopic}`;
-  const allChip = `<button class="chip all-chip on" data-sub="" onclick="toggleSub(this,this.dataset.sub)">All</button>`;
-  const subChips = subs.map(s =>
-    `<button class="chip" data-sub="${s}" onclick="toggleSub(this,this.dataset.sub)">${s}</button>`
-  ).join('');
+  const allChip  = `<button class="chip all-chip on" data-sub="" onclick="toggleSub(this,this.dataset.sub)">All</button>`;
+  const subChips = subs.map(s => `<button class="chip" data-sub="${s}" onclick="toggleSub(this,this.dataset.sub)">${s}</button>`).join('');
   document.getElementById('subtopic-chips').innerHTML = allChip + subChips;
   wrap.classList.add('visible');
 }
@@ -390,23 +336,16 @@ function toggleSub(el, sub) {
   document.querySelectorAll('#subtopic-chips .chip').forEach(c => c.classList.remove('on'));
   el.classList.add('on');
   selectedSubtopic = sub === '' ? null : sub;
-  if (isEmath()) findQuestions();
-}
-
-function toggleDiff(el) {
-  const d = el.dataset.diff;
-  document.querySelectorAll('.chip[data-diff]').forEach(c => c.classList.remove('on'));
-  if (selectedDiff === d) { selectedDiff = null; }
-  else { selectedDiff = d; el.classList.add('on'); }
+  findQuestions();
 }
 
 function clearFilters() {
-  selectedTopic = null; selectedSubtopic = null; selectedDiff = null;
+  selectedTopic = null; selectedSubtopic = null;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
   const sw = document.getElementById('subtopic-wrap');
   if (sw) sw.classList.remove('visible');
   document.getElementById('results').innerHTML = '';
-  if (isEmath()) document.getElementById('clear-row').style.display = 'none';
+  document.getElementById('clear-row').style.display = 'none';
 }
 
 function sortByDifficulty(questions) {
@@ -419,14 +358,13 @@ function sortByDifficulty(questions) {
 
 function findQuestions() {
   let res = allQuestions;
-  if (selectedTopic) res = res.filter(q => q.topic === selectedTopic);
+  if (selectedTopic)    res = res.filter(q => q.topic === selectedTopic);
   if (selectedSubtopic) res = res.filter(q => q.subtopic === selectedSubtopic);
-  if (selectedDiff) res = res.filter(q => String(q.difficulty).trim() === String(selectedDiff).trim());
-  if (isEmath()) res = sortByDifficulty(res);
+  res = sortByDifficulty(res);
 
   const el = document.getElementById('results');
   if (res.length === 0) {
-    el.innerHTML = `<div class="empty-state"><p>No questions match your filters.<br>Try a different topic or subtopic.</p></div>`;
+    el.innerHTML = `<div class="empty-state"><p>No questions found for this topic.</p></div>`;
     return;
   }
 
@@ -533,7 +471,7 @@ function renderPapers() {
 }
 
 function togglePaper(id) {
-  const body = document.getElementById(id);
+  const body   = document.getElementById(id);
   const toggle = document.getElementById('toggle-' + id);
   const isOpen = body.classList.contains('open');
   body.classList.toggle('open', !isOpen);
