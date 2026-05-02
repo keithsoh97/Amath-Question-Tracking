@@ -148,7 +148,7 @@ let pdfDoc      = null;
 let currentPage = startPage;
 let scale       = 1.4;
 
-if (label) document.getElementById('header-title').textContent = `Question ${label}`;
+if (label) document.getElementById('header-title').textContent = label;
 if (!fileId) {
   showError('No file specified.', 'Make sure the link includes a valid file URL.');
 } else {
